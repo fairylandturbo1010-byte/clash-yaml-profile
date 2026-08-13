@@ -5,10 +5,11 @@
 #   1. 订阅链接已内置（proxy-providers -> Company-Profile -> url）
 #   2. 国内网站/应用 → 直连
 #   3. AI 服务(OpenAI/Gemini等) → 美国节点
-#   4. 流媒体(YouTube/Instagram等) → 日本/香港/新加坡等亚洲节点(避开美国)
-#   5. 节点自动切换：默认使用最低延迟节点
-#   6. 订阅每 2 天(48小时)更新一次
-#   7. Adobe 全线产品 → 断网(REJECT)
+#   4. 流媒体(YouTube/Instagram等) → 亚洲节点(避开美国)
+#   5. 节点按国家/地区细分分组，自动选最低延迟
+#   6. 兜底规则可手动选择任意节点/分组
+#   7. 订阅每 2 天(48小时)更新一次
+#   8. Adobe 全线产品 → 断网(REJECT)
 # ====================================================================
 
 # ======================== 基础设置 ========================
@@ -55,15 +56,21 @@ proxy-providers:
 
 # ======================== 代理组 ========================
 proxy-groups:
-  # 手动选择：总入口，可手动切换节点
+  # 总入口：手动选择任意分组/节点
   - name: "🚀 手动选择"
     type: select
     use:
       - Company-Profile
     proxies:
       - "♻️ 自动选择"
-      - "🇺🇸 美国节点"
-      - "🌏 亚洲节点"
+      - "🌏 亚洲"
+      - "🇯🇵 日本"
+      - "🇭🇰 香港"
+      - "🇸🇬 新加坡"
+      - "🇰🇷 韩国"
+      - "🇨🇳 台湾"
+      - "🇺🇸 美国"
+      - "🇬🇧 英国"
       - "DIRECT"
 
   # 自动选择：全部节点，按最低延迟自动切换
@@ -75,18 +82,8 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  # 美国节点：AI 服务专用（自动选最低延迟的美国节点）
-  - name: "🇺🇸 美国节点"
-    type: url-test
-    use:
-      - Company-Profile
-    filter: "美国"
-    url: http://www.gstatic.com/generate_204
-    interval: 300
-    tolerance: 50
-
-  # 亚洲节点：流媒体专用（日本/香港/新加坡/韩国/台湾，避开美国）
-  - name: "🌏 亚洲节点"
+  # 亚洲（洲级汇总）：自动选亚洲最低延迟节点
+  - name: "🌏 亚洲"
     type: url-test
     use:
       - Company-Profile
@@ -95,13 +92,85 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  # 兜底规则：未匹配流量
+  # ==================== 国家/地区分组 ====================
+  # 每个国家/地区一个分组，自动选该地区最低延迟节点
+
+  - name: "🇯🇵 日本"
+    type: url-test
+    use:
+      - Company-Profile
+    filter: "日本"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  - name: "🇭🇰 香港"
+    type: url-test
+    use:
+      - Company-Profile
+    filter: "香港"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  - name: "🇸🇬 新加坡"
+    type: url-test
+    use:
+      - Company-Profile
+    filter: "新加坡"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  - name: "🇰🇷 韩国"
+    type: url-test
+    use:
+      - Company-Profile
+    filter: "韩国"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  - name: "🇨🇳 台湾"
+    type: url-test
+    use:
+      - Company-Profile
+    filter: "台湾"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  - name: "🇺🇸 美国"
+    type: url-test
+    use:
+      - Company-Profile
+    filter: "美国"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  - name: "🇬🇧 英国"
+    type: url-test
+    use:
+      - Company-Profile
+    filter: "英国"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  # 兜底规则：可手动选择任意分组/节点（含自动选择）
   - name: "🎯 兜底规则"
     type: select
     proxies:
       - "♻️ 自动选择"
-      - "🇺🇸 美国节点"
-      - "🌏 亚洲节点"
+      - "🌏 亚洲"
+      - "🇯🇵 日本"
+      - "🇭🇰 香港"
+      - "🇸🇬 新加坡"
+      - "🇰🇷 韩国"
+      - "🇨🇳 台湾"
+      - "🇺🇸 美国"
+      - "🇬🇧 英国"
       - "DIRECT"
 
 # ======================== 规则 ========================
@@ -148,87 +217,87 @@ rules:
   # 第二优先级：AI 服务 → 美国节点
   # ================================================================
   # OpenAI / ChatGPT
-  - DOMAIN-SUFFIX,openai.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,chatgpt.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,oaistatic.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,oaiusercontent.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,sora.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,openai.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,chatgpt.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,oaistatic.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,oaiusercontent.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,sora.com,🇺🇸 美国
   # Anthropic / Claude
-  - DOMAIN-SUFFIX,anthropic.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,claude.ai,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,claudeusercontent.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,anthropic.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,claude.ai,🇺🇸 美国
+  - DOMAIN-SUFFIX,claudeusercontent.com,🇺🇸 美国
   # Google AI / Gemini
-  - DOMAIN-SUFFIX,gemini.google.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,bard.google.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,ai.google.dev,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,deepmind.google,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,deepmind.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,aistudio.google.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,gemini.google.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,bard.google.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,ai.google.dev,🇺🇸 美国
+  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,deepmind.google,🇺🇸 美国
+  - DOMAIN-SUFFIX,deepmind.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,aistudio.google.com,🇺🇸 美国
   # 其他 AI
-  - DOMAIN-SUFFIX,groq.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,perplexity.ai,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,mistral.ai,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,cohere.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,poe.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,copilot.microsoft.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,copilot.github.com,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,x.ai,🇺🇸 美国节点
-  - DOMAIN-SUFFIX,grok.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,groq.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,perplexity.ai,🇺🇸 美国
+  - DOMAIN-SUFFIX,mistral.ai,🇺🇸 美国
+  - DOMAIN-SUFFIX,cohere.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,poe.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,copilot.microsoft.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,copilot.github.com,🇺🇸 美国
+  - DOMAIN-SUFFIX,x.ai,🇺🇸 美国
+  - DOMAIN-SUFFIX,grok.com,🇺🇸 美国
 
   # ================================================================
-  # 第三优先级：流媒体 → 亚洲节点（日本/香港/新加坡，避开美国）
+  # 第三优先级：流媒体 → 亚洲节点（避开美国）
   # ================================================================
   # YouTube
-  - DOMAIN-SUFFIX,youtube.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,ytimg.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,googlevideo.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,youtu.be,🌏 亚洲节点
-  - DOMAIN-SUFFIX,yt.be,🌏 亚洲节点
+  - DOMAIN-SUFFIX,youtube.com,🌏 亚洲
+  - DOMAIN-SUFFIX,ytimg.com,🌏 亚洲
+  - DOMAIN-SUFFIX,googlevideo.com,🌏 亚洲
+  - DOMAIN-SUFFIX,youtu.be,🌏 亚洲
+  - DOMAIN-SUFFIX,yt.be,🌏 亚洲
   # Instagram
-  - DOMAIN-SUFFIX,instagram.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,cdninstagram.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,ig.me,🌏 亚洲节点
+  - DOMAIN-SUFFIX,instagram.com,🌏 亚洲
+  - DOMAIN-SUFFIX,cdninstagram.com,🌏 亚洲
+  - DOMAIN-SUFFIX,ig.me,🌏 亚洲
   # Netflix
-  - DOMAIN-SUFFIX,netflix.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,nflxvideo.net,🌏 亚洲节点
-  - DOMAIN-SUFFIX,nflximg.net,🌏 亚洲节点
-  - DOMAIN-SUFFIX,nflxso.net,🌏 亚洲节点
-  - DOMAIN-SUFFIX,nflxext.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,netflix.com,🌏 亚洲
+  - DOMAIN-SUFFIX,nflxvideo.net,🌏 亚洲
+  - DOMAIN-SUFFIX,nflximg.net,🌏 亚洲
+  - DOMAIN-SUFFIX,nflxso.net,🌏 亚洲
+  - DOMAIN-SUFFIX,nflxext.com,🌏 亚洲
   # Spotify
-  - DOMAIN-SUFFIX,spotify.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,scdn.co,🌏 亚洲节点
-  - DOMAIN-SUFFIX,spotifycdn.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,spotifycdn.net,🌏 亚洲节点
+  - DOMAIN-SUFFIX,spotify.com,🌏 亚洲
+  - DOMAIN-SUFFIX,scdn.co,🌏 亚洲
+  - DOMAIN-SUFFIX,spotifycdn.com,🌏 亚洲
+  - DOMAIN-SUFFIX,spotifycdn.net,🌏 亚洲
   # Twitch
-  - DOMAIN-SUFFIX,twitch.tv,🌏 亚洲节点
-  - DOMAIN-SUFFIX,twitchcdn.net,🌏 亚洲节点
-  - DOMAIN-SUFFIX,jtvnw.net,🌏 亚洲节点
-  - DOMAIN-SUFFIX,ttvnw.net,🌏 亚洲节点
+  - DOMAIN-SUFFIX,twitch.tv,🌏 亚洲
+  - DOMAIN-SUFFIX,twitchcdn.net,🌏 亚洲
+  - DOMAIN-SUFFIX,jtvnw.net,🌏 亚洲
+  - DOMAIN-SUFFIX,ttvnw.net,🌏 亚洲
   # Disney+
-  - DOMAIN-SUFFIX,disneyplus.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,disney.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,dssott.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,bamgrid.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,disneyplus.com,🌏 亚洲
+  - DOMAIN-SUFFIX,disney.com,🌏 亚洲
+  - DOMAIN-SUFFIX,dssott.com,🌏 亚洲
+  - DOMAIN-SUFFIX,bamgrid.com,🌏 亚洲
   # Hulu / HBO Max / Prime Video
-  - DOMAIN-SUFFIX,hulu.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,huluim.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,hbomax.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,hbomaxcdn.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,primevideo.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,amazonvideo.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,hulu.com,🌏 亚洲
+  - DOMAIN-SUFFIX,huluim.com,🌏 亚洲
+  - DOMAIN-SUFFIX,hbomax.com,🌏 亚洲
+  - DOMAIN-SUFFIX,hbomaxcdn.com,🌏 亚洲
+  - DOMAIN-SUFFIX,primevideo.com,🌏 亚洲
+  - DOMAIN-SUFFIX,amazonvideo.com,🌏 亚洲
   # TikTok
-  - DOMAIN-SUFFIX,tiktok.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,tiktokcdn.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,tiktokv.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,musical.ly,🌏 亚洲节点
-  - DOMAIN-SUFFIX,musically.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,tiktok.com,🌏 亚洲
+  - DOMAIN-SUFFIX,tiktokcdn.com,🌏 亚洲
+  - DOMAIN-SUFFIX,tiktokv.com,🌏 亚洲
+  - DOMAIN-SUFFIX,musical.ly,🌏 亚洲
+  - DOMAIN-SUFFIX,musically.com,🌏 亚洲
   # 其他流媒体/ACG
-  - DOMAIN-SUFFIX,pixiv.net,🌏 亚洲节点
-  - DOMAIN-SUFFIX,pximg.net,🌏 亚洲节点
-  - DOMAIN-SUFFIX,crunchyroll.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,vimeo.com,🌏 亚洲节点
-  - DOMAIN-SUFFIX,vimeocdn.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,pixiv.net,🌏 亚洲
+  - DOMAIN-SUFFIX,pximg.net,🌏 亚洲
+  - DOMAIN-SUFFIX,crunchyroll.com,🌏 亚洲
+  - DOMAIN-SUFFIX,vimeo.com,🌏 亚洲
+  - DOMAIN-SUFFIX,vimeocdn.com,🌏 亚洲
 
   # ================================================================
   # 第四优先级：国内网站/应用 → 直连
@@ -319,6 +388,6 @@ rules:
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
 
   # ================================================================
-  # 兜底：其余国外流量 → 自动选择（最低延迟）
+  # 兜底：其余流量 → 兜底规则（可手动切换任意节点/自动选择）
   # ================================================================
   - MATCH,🎯 兜底规则

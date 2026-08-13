@@ -172,7 +172,7 @@ proxy-groups:
       - "🇨🇳 台湾"
       - "🇬🇧 英国"
 
-  # Claude：支持香港等亚太地区
+  # Claude：不支持香港，故不提供香港选项
   - name: "🤖 Claude"
     type: select
     proxies:
@@ -182,7 +182,6 @@ proxy-groups:
       - "🇸🇬 新加坡"
       - "🇰🇷 韩国"
       - "🇨🇳 台湾"
-      - "🇭🇰 香港"
 
   # Gemini：支持香港等亚太地区
   - name: "🤖 Gemini"

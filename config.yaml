@@ -158,6 +158,44 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
+  # ==================== AI 服务专属分组 ====================
+  # 默认走美国，仅提供对该 AI 友好的地区节点选项
+
+  # OpenAI / ChatGPT：不支持香港，故不提供香港选项
+  - name: "🤖 OpenAI"
+    type: select
+    proxies:
+      - "🇺🇸 美国"   # 默认
+      - "🇯🇵 日本"
+      - "🇸🇬 新加坡"
+      - "🇰🇷 韩国"
+      - "🇨🇳 台湾"
+      - "🇬🇧 英国"
+
+  # Claude：支持香港等亚太地区
+  - name: "🤖 Claude"
+    type: select
+    proxies:
+      - "🇺🇸 美国"   # 默认
+      - "🇬🇧 英国"
+      - "🇯🇵 日本"
+      - "🇸🇬 新加坡"
+      - "🇰🇷 韩国"
+      - "🇨🇳 台湾"
+      - "🇭🇰 香港"
+
+  # Gemini：支持香港等亚太地区
+  - name: "🤖 Gemini"
+    type: select
+    proxies:
+      - "🇺🇸 美国"   # 默认
+      - "🇬🇧 英国"
+      - "🇯🇵 日本"
+      - "🇸🇬 新加坡"
+      - "🇰🇷 韩国"
+      - "🇨🇳 台湾"
+      - "🇭🇰 香港"
+
   # 兜底规则：可手动选择任意分组/节点（含自动选择）
   - name: "🎯 兜底规则"
     type: select
@@ -214,27 +252,27 @@ rules:
   - DOMAIN-KEYWORD,adobe,REJECT
 
   # ================================================================
-  # 第二优先级：AI 服务 → 美国节点
+  # 第二优先级：AI 服务（各自专属分组，默认美国，可手动切换友好地区）
   # ================================================================
-  # OpenAI / ChatGPT
-  - DOMAIN-SUFFIX,openai.com,🇺🇸 美国
-  - DOMAIN-SUFFIX,chatgpt.com,🇺🇸 美国
-  - DOMAIN-SUFFIX,oaistatic.com,🇺🇸 美国
-  - DOMAIN-SUFFIX,oaiusercontent.com,🇺🇸 美国
-  - DOMAIN-SUFFIX,sora.com,🇺🇸 美国
-  # Anthropic / Claude
-  - DOMAIN-SUFFIX,anthropic.com,🇺🇸 美国
-  - DOMAIN-SUFFIX,claude.ai,🇺🇸 美国
-  - DOMAIN-SUFFIX,claudeusercontent.com,🇺🇸 美国
-  # Google AI / Gemini
-  - DOMAIN-SUFFIX,gemini.google.com,🇺🇸 美国
-  - DOMAIN-SUFFIX,bard.google.com,🇺🇸 美国
-  - DOMAIN-SUFFIX,ai.google.dev,🇺🇸 美国
-  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🇺🇸 美国
-  - DOMAIN-SUFFIX,deepmind.google,🇺🇸 美国
-  - DOMAIN-SUFFIX,deepmind.com,🇺🇸 美国
-  - DOMAIN-SUFFIX,aistudio.google.com,🇺🇸 美国
-  # 其他 AI
+  # OpenAI / ChatGPT → 🤖 OpenAI（不支持香港，无香港选项）
+  - DOMAIN-SUFFIX,openai.com,🤖 OpenAI
+  - DOMAIN-SUFFIX,chatgpt.com,🤖 OpenAI
+  - DOMAIN-SUFFIX,oaistatic.com,🤖 OpenAI
+  - DOMAIN-SUFFIX,oaiusercontent.com,🤖 OpenAI
+  - DOMAIN-SUFFIX,sora.com,🤖 OpenAI
+  # Anthropic / Claude → 🤖 Claude
+  - DOMAIN-SUFFIX,anthropic.com,🤖 Claude
+  - DOMAIN-SUFFIX,claude.ai,🤖 Claude
+  - DOMAIN-SUFFIX,claudeusercontent.com,🤖 Claude
+  # Google AI / Gemini → 🤖 Gemini（支持香港）
+  - DOMAIN-SUFFIX,gemini.google.com,🤖 Gemini
+  - DOMAIN-SUFFIX,bard.google.com,🤖 Gemini
+  - DOMAIN-SUFFIX,ai.google.dev,🤖 Gemini
+  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖 Gemini
+  - DOMAIN-SUFFIX,deepmind.google,🤖 Gemini
+  - DOMAIN-SUFFIX,deepmind.com,🤖 Gemini
+  - DOMAIN-SUFFIX,aistudio.google.com,🤖 Gemini
+  # 其他 AI → 保持美国节点
   - DOMAIN-SUFFIX,groq.com,🇺🇸 美国
   - DOMAIN-SUFFIX,perplexity.ai,🇺🇸 美国
   - DOMAIN-SUFFIX,mistral.ai,🇺🇸 美国

@@ -1,0 +1,324 @@
+# ====================================================================
+# Company Profile - Clash 配置文件
+# ====================================================================
+# 说明：
+#   1. 订阅链接已内置（proxy-providers -> Company-Profile -> url）
+#   2. 国内网站/应用 → 直连
+#   3. AI 服务(OpenAI/Gemini等) → 美国节点
+#   4. 流媒体(YouTube/Instagram等) → 日本/香港/新加坡等亚洲节点(避开美国)
+#   5. 节点自动切换：默认使用最低延迟节点
+#   6. 订阅每 2 天(48小时)更新一次
+#   7. Adobe 全线产品 → 断网(REJECT)
+# ====================================================================
+
+# ======================== 基础设置 ========================
+mixed-port: 7890
+allow-lan: false
+bind-address: '*'
+mode: rule
+log-level: info
+ipv6: false
+external-controller: '127.0.0.1:9090'
+
+# ======================== DNS 设置 ========================
+dns:
+  enable: true
+  ipv6: false
+  default-nameserver: [223.5.5.5, 119.29.29.29, 114.114.114.114]
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: true
+  nameserver: [223.5.5.5, 119.29.29.29, 114.114.114.114]
+  fallback: [1.1.1.1, 8.8.8.8]
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr: [240.0.0.0/4]
+    domain: [+.google.com, +.facebook.com, +.youtube.com, +.openai.com]
+
+# ====================================================================
+# >>>>>>>>>>>>>>>>>>> 订阅链接配置位置 <<<<<<<<<<<<<<<<<<<
+# 如需更换订阅，请修改下方 url 的值（替换整段链接即可）
+# interval: 订阅更新间隔（秒），172800 = 48小时 = 每2天更新一次
+# ====================================================================
+proxy-providers:
+  Company-Profile:
+    type: http
+    url: "https://liangxin.xyz/api/v1/liangxin?OwO=6d6fd6109c7631b213e1a320ef1645db"
+    interval: 172800
+    path: ./proxy_providers/company-profile.yaml
+    health-check:
+      enable: true
+      interval: 600
+      lazy: true
+      url: http://www.gstatic.com/generate_204
+
+# ======================== 代理组 ========================
+proxy-groups:
+  # 手动选择：总入口，可手动切换节点
+  - name: "🚀 手动选择"
+    type: select
+    use:
+      - Company-Profile
+    proxies:
+      - "♻️ 自动选择"
+      - "🇺🇸 美国节点"
+      - "🌏 亚洲节点"
+      - "DIRECT"
+
+  # 自动选择：全部节点，按最低延迟自动切换
+  - name: "♻️ 自动选择"
+    type: url-test
+    use:
+      - Company-Profile
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  # 美国节点：AI 服务专用（自动选最低延迟的美国节点）
+  - name: "🇺🇸 美国节点"
+    type: url-test
+    use:
+      - Company-Profile
+    filter: "美国"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  # 亚洲节点：流媒体专用（日本/香港/新加坡/韩国/台湾，避开美国）
+  - name: "🌏 亚洲节点"
+    type: url-test
+    use:
+      - Company-Profile
+    filter: "(日本|香港|新加坡|韩国|台湾)"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  # 兜底规则：未匹配流量
+  - name: "🎯 兜底规则"
+    type: select
+    proxies:
+      - "♻️ 自动选择"
+      - "🇺🇸 美国节点"
+      - "🌏 亚洲节点"
+      - "DIRECT"
+
+# ======================== 规则 ========================
+rules:
+  # ================================================================
+  # 第一优先级：Adobe 全线产品断网（阻止授权验证弹窗/闪退）
+  # ================================================================
+  - DOMAIN-SUFFIX,adobe.com,REJECT
+  - DOMAIN-SUFFIX,adobe.io,REJECT
+  - DOMAIN-SUFFIX,adobestatic.com,REJECT
+  - DOMAIN-SUFFIX,adobeexchange.com,REJECT
+  - DOMAIN-SUFFIX,adobedtm.com,REJECT
+  - DOMAIN-SUFFIX,adobesc.com,REJECT
+  - DOMAIN-SUFFIX,adobelogin.com,REJECT
+  - DOMAIN-SUFFIX,adobedc.net,REJECT
+  - DOMAIN-SUFFIX,adobecc.com,REJECT
+  - DOMAIN-SUFFIX,adobeccstatic.com,REJECT
+  - DOMAIN-SUFFIX,adobespark.com,REJECT
+  - DOMAIN-SUFFIX,adobestock.com,REJECT
+  - DOMAIN-SUFFIX,creativecloud.com,REJECT
+  - DOMAIN-SUFFIX,cc-api-data.adobe.io,REJECT
+  - DOMAIN-SUFFIX,cchd.adobe.com,REJECT
+  - DOMAIN-SUFFIX,ims-na1.adobelogin.com,REJECT
+  - DOMAIN-SUFFIX,na1r.services.adobe.com,REJECT
+  - DOMAIN-SUFFIX,adobeid-na1.services.adobe.com,REJECT
+  - DOMAIN-SUFFIX,adobeid.com,REJECT
+  - DOMAIN-SUFFIX,accounts.adobe.com,REJECT
+  - DOMAIN-SUFFIX,adobeidentity.com,REJECT
+  - DOMAIN-SUFFIX,genuine.adobe.com,REJECT
+  - DOMAIN-SUFFIX,adobegenuine.com,REJECT
+  - DOMAIN-SUFFIX,lm.licenses.adobe.com,REJECT
+  - DOMAIN-SUFFIX,licenses.adobe.com,REJECT
+  - DOMAIN-SUFFIX,swupmf.adobe.com,REJECT
+  - DOMAIN-SUFFIX,sync.adobe.com,REJECT
+  - DOMAIN-SUFFIX,typekit.net,REJECT
+  - DOMAIN-SUFFIX,fonts.adobe.com,REJECT
+  - DOMAIN-SUFFIX,behance.net,REJECT
+  - DOMAIN-SUFFIX,omtrdc.net,REJECT
+  - DOMAIN-SUFFIX,demdex.net,REJECT
+  - DOMAIN-SUFFIX,2o7.net,REJECT
+  - DOMAIN-KEYWORD,adobe,REJECT
+
+  # ================================================================
+  # 第二优先级：AI 服务 → 美国节点
+  # ================================================================
+  # OpenAI / ChatGPT
+  - DOMAIN-SUFFIX,openai.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,chatgpt.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,oaistatic.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,oaiusercontent.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,sora.com,🇺🇸 美国节点
+  # Anthropic / Claude
+  - DOMAIN-SUFFIX,anthropic.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,claude.ai,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,claudeusercontent.com,🇺🇸 美国节点
+  # Google AI / Gemini
+  - DOMAIN-SUFFIX,gemini.google.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,bard.google.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,ai.google.dev,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,deepmind.google,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,deepmind.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,aistudio.google.com,🇺🇸 美国节点
+  # 其他 AI
+  - DOMAIN-SUFFIX,groq.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,perplexity.ai,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,mistral.ai,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,cohere.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,poe.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,copilot.microsoft.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,copilot.github.com,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,x.ai,🇺🇸 美国节点
+  - DOMAIN-SUFFIX,grok.com,🇺🇸 美国节点
+
+  # ================================================================
+  # 第三优先级：流媒体 → 亚洲节点（日本/香港/新加坡，避开美国）
+  # ================================================================
+  # YouTube
+  - DOMAIN-SUFFIX,youtube.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,ytimg.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,googlevideo.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,youtu.be,🌏 亚洲节点
+  - DOMAIN-SUFFIX,yt.be,🌏 亚洲节点
+  # Instagram
+  - DOMAIN-SUFFIX,instagram.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,cdninstagram.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,ig.me,🌏 亚洲节点
+  # Netflix
+  - DOMAIN-SUFFIX,netflix.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,nflxvideo.net,🌏 亚洲节点
+  - DOMAIN-SUFFIX,nflximg.net,🌏 亚洲节点
+  - DOMAIN-SUFFIX,nflxso.net,🌏 亚洲节点
+  - DOMAIN-SUFFIX,nflxext.com,🌏 亚洲节点
+  # Spotify
+  - DOMAIN-SUFFIX,spotify.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,scdn.co,🌏 亚洲节点
+  - DOMAIN-SUFFIX,spotifycdn.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,spotifycdn.net,🌏 亚洲节点
+  # Twitch
+  - DOMAIN-SUFFIX,twitch.tv,🌏 亚洲节点
+  - DOMAIN-SUFFIX,twitchcdn.net,🌏 亚洲节点
+  - DOMAIN-SUFFIX,jtvnw.net,🌏 亚洲节点
+  - DOMAIN-SUFFIX,ttvnw.net,🌏 亚洲节点
+  # Disney+
+  - DOMAIN-SUFFIX,disneyplus.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,disney.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,dssott.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,bamgrid.com,🌏 亚洲节点
+  # Hulu / HBO Max / Prime Video
+  - DOMAIN-SUFFIX,hulu.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,huluim.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,hbomax.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,hbomaxcdn.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,primevideo.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,amazonvideo.com,🌏 亚洲节点
+  # TikTok
+  - DOMAIN-SUFFIX,tiktok.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,tiktokcdn.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,tiktokv.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,musical.ly,🌏 亚洲节点
+  - DOMAIN-SUFFIX,musically.com,🌏 亚洲节点
+  # 其他流媒体/ACG
+  - DOMAIN-SUFFIX,pixiv.net,🌏 亚洲节点
+  - DOMAIN-SUFFIX,pximg.net,🌏 亚洲节点
+  - DOMAIN-SUFFIX,crunchyroll.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,vimeo.com,🌏 亚洲节点
+  - DOMAIN-SUFFIX,vimeocdn.com,🌏 亚洲节点
+
+  # ================================================================
+  # 第四优先级：国内网站/应用 → 直连
+  # ================================================================
+  # 国内通用域名
+  - DOMAIN-SUFFIX,cn,DIRECT
+  - DOMAIN-SUFFIX,com.cn,DIRECT
+  - DOMAIN-SUFFIX,net.cn,DIRECT
+  - DOMAIN-SUFFIX,org.cn,DIRECT
+  - DOMAIN-SUFFIX,gov.cn,DIRECT
+  - DOMAIN-SUFFIX,edu.cn,DIRECT
+  # 搜索引擎
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,bdstatic.com,DIRECT
+  - DOMAIN-SUFFIX,bdimg.com,DIRECT
+  - DOMAIN-SUFFIX,sogou.com,DIRECT
+  - DOMAIN-SUFFIX,so.com,DIRECT
+  - DOMAIN-SUFFIX,360.cn,DIRECT
+  # 社交/通讯
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,weixin.com,DIRECT
+  - DOMAIN-SUFFIX,tencent.com,DIRECT
+  - DOMAIN-SUFFIX,weibo.com,DIRECT
+  - DOMAIN-SUFFIX,sina.com.cn,DIRECT
+  - DOMAIN-SUFFIX,sinaimg.cn,DIRECT
+  - DOMAIN-SUFFIX,zhihu.com,DIRECT
+  - DOMAIN-SUFFIX,zhimg.com,DIRECT
+  - DOMAIN-SUFFIX,douban.com,DIRECT
+  - DOMAIN-SUFFIX,doubanio.com,DIRECT
+  # 电商
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,tmall.com,DIRECT
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,1688.com,DIRECT
+  - DOMAIN-SUFFIX,alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,aliyun.com,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,pinduoduo.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.com,DIRECT
+  - DOMAIN-SUFFIX,dianping.com,DIRECT
+  - DOMAIN-SUFFIX,suning.com,DIRECT
+  # 视频/音乐
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
+  - DOMAIN-SUFFIX,hdslb.com,DIRECT
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,douyinpic.com,DIRECT
+  - DOMAIN-SUFFIX,ixigua.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+  - DOMAIN-SUFFIX,bytednsdoc.com,DIRECT
+  - DOMAIN-SUFFIX,pstatp.com,DIRECT
+  - DOMAIN-SUFFIX,snssdk.com,DIRECT
+  - DOMAIN-SUFFIX,toutiao.com,DIRECT
+  - DOMAIN-SUFFIX,iqiyi.com,DIRECT
+  - DOMAIN-SUFFIX,youku.com,DIRECT
+  - DOMAIN-SUFFIX,mgtv.com,DIRECT
+  - DOMAIN-SUFFIX,netease.com,DIRECT
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,126.com,DIRECT
+  - DOMAIN-SUFFIX,qqmusic.com,DIRECT
+  # 科技/云服务
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
+  - DOMAIN-SUFFIX,miui.com,DIRECT
+  - DOMAIN-SUFFIX,huawei.com,DIRECT
+  - DOMAIN-SUFFIX,oppo.com,DIRECT
+  - DOMAIN-SUFFIX,vivo.com,DIRECT
+  - DOMAIN-SUFFIX,qiniu.com,DIRECT
+  - DOMAIN-SUFFIX,qcloud.com,DIRECT
+  - DOMAIN-SUFFIX,myqcloud.com,DIRECT
+  # 开发/其他
+  - DOMAIN-SUFFIX,csdn.net,DIRECT
+  - DOMAIN-SUFFIX,gitee.com,DIRECT
+  - DOMAIN-SUFFIX,cnblogs.com,DIRECT
+  - DOMAIN-SUFFIX,segmentfault.com,DIRECT
+  - DOMAIN-SUFFIX,jianshu.com,DIRECT
+  - DOMAIN-SUFFIX,cnki.net,DIRECT
+  - DOMAIN-SUFFIX,wanfangdata.com.cn,DIRECT
+  # 国内 IP
+  - GEOIP,CN,DIRECT
+
+  # 局域网
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR6,fe80::/10,DIRECT,no-resolve
+
+  # ================================================================
+  # 兜底：其余国外流量 → 自动选择（最低延迟）
+  # ================================================================
+  - MATCH,🎯 兜底规则

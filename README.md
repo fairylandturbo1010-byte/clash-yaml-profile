@@ -1,4 +1,4 @@
-# Company Profile - Clash 配置文件
+#  Clash 配置文件
 
 一套开箱即用的 Clash 分流配置：国内直连、AI 走美国、流媒体走亚洲、Adobe 断网、节点按国家/地区细分并自动选最低延迟。
 

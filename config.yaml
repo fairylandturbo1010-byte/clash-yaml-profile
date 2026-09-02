@@ -1,38 +1,40 @@
 # ============================================================
 #  Clash YAML Profile
-#  个人 Clash 分流配置（适用于 Clash Meta / Mihomo 内核）
+#  Personal Clash / Mihomo rule-based config
 #
-#  【分流策略】规则从上到下匹配，优先级如下
-#   1. Adobe 全家桶         → 断网（REJECT / 🛑 Block）
-#   2. 内网 / 本地流量       → 直连
-#   3. AI 服务              → OpenAI / Claude / Gemini 各自分组，默认美国节点
-#   4. 流媒体               → 默认亚洲节点（日/港/新/韩/台）
-#   5. 中国大陆网站与 IP     → 直连
-#   6. 其他未命中流量        → 🚀 Node Select（可手动切换）
+#  [Rule priority] rules are matched top to bottom
+#   1. Adobe (all domains)   -> blocked (REJECT / 🛑 Block)
+#   2. LAN / local traffic   -> DIRECT
+#   3. AI services           -> OpenAI / Claude / Gemini groups, US by default
+#   4. Streaming             -> Asia nodes by default (JP / HK / SG / KR / TW)
+#   5. Mainland China        -> DIRECT
+#   6. Everything else       -> 🚀 Node Select (manual switch)
 #
-#   ⚠️ 美国节点默认仅提供给 AI 服务，降低频繁切换地区带来的账号风控风险
-#   ⚠️ 所有分组名称均为英文（规则以英文逗号分隔，组名内禁止出现逗号）
+#   NOTE: US nodes are used for AI services by default, to reduce the risk of
+#         account risk-control triggered by frequent region switching.
+#   NOTE: all group names are in English. Clash rules are comma-separated,
+#         so a group name must never contain a comma.
 #
-#  【适用客户端】
+#  [Tested clients]
 #   Clash Verge Rev / Mihomo Party / FlClash / Clash Meta
 # ============================================================
 
-# ---------- 基础设置 ----------
-mixed-port: 7890          # 代理端口（HTTP / SOCKS5 共用）
-allow-lan: false          # 是否允许局域网内其他设备连接
-mode: rule                # 分流模式
+# ---------- General ----------
+mixed-port: 7890          # HTTP / SOCKS5 port
+allow-lan: false          # allow other devices on the LAN to connect
+mode: rule                # rule / global / direct
 log-level: info
 ipv6: false
-unified-delay: true       # 统一延迟显示（测速结果更接近真实体验）
-tcp-concurrent: true      # TCP 并发连接，加快首包响应
-# external-controller: 127.0.0.1:9090   # 如需 Web 控制面板可取消注释
+unified-delay: true       # unified delay display (closer to real experience)
+tcp-concurrent: true      # TCP concurrent connections, faster first byte
+# external-controller: 127.0.0.1:9090   # uncomment for the web dashboard
 
-# 记住节点选择（客户端重启后保持之前的节点选择）
+# Remember the selected node across client restarts
 profile:
   store-selected: true
   store-fake-ip: true
 
-# ---------- DNS 设置 ----------
+# ---------- DNS ----------
 dns:
   enable: true
   ipv6: false
@@ -82,9 +84,9 @@ dns:
       - 119.29.29.29
 
 # ============================================================
-#  >>>>>>>>>>>>>>>>>>  订阅链接填写位置  <<<<<<<<<<<<<<<<<<<<
-#  更换机场时，只改下面 url 这一行即可，其余内容无需改动
-#  interval: 订阅更新间隔（秒），172800 = 48 小时 = 每 2 天更新一次
+#  >>>>>>>>>>>>>>>>>>  Subscription URL  <<<<<<<<<<<<<<<<<<<<
+#  When changing provider, only edit the url below.
+#  interval: update interval in seconds, 172800 = 48h = every 2 days
 # ============================================================
 proxy-providers:
   Provider:
@@ -97,9 +99,9 @@ proxy-providers:
       url: http://www.gstatic.com/generate_204
       interval: 300
 
-# ---------- 代理组 ----------
+# ---------- Proxy groups ----------
 proxy-groups:
-  # 默认出口：所有未命中国内规则的国外流量都从这里走
+  # Default outbound: all foreign traffic not matched by China rules
   - name: 🚀 Node Select
     type: select
     proxies:
@@ -119,7 +121,7 @@ proxy-groups:
     use:
       - Provider
 
-  # 自动测速，选择延迟最低的节点
+  # Auto speed test, picks the lowest latency node
   - name: ♻️ Auto Select
     type: url-test
     use:
@@ -128,11 +130,12 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  # ---------- 地区节点池（按国家/地区细分） ----------
-  # 通过 filter 正则匹配节点名称自动归组，自动选该地区延迟最低的节点
-  # 若订阅里地区命名不同，改对应的正则即可
+  # ---------- Region node pools (by country / region) ----------
+  # Nodes are grouped by the filter regex matching node names,
+  # and the fastest node of that region is selected automatically.
+  # If your provider names regions differently, adjust the regex.
 
-  # 亚洲汇总：Japan / Hong Kong / Singapore / South Korea / Taiwan
+  # Asia: Japan / Hong Kong / Singapore / South Korea / Taiwan
   - name: 🌏 Asia
     type: url-test
     use:
@@ -205,9 +208,9 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  # ---------- 用途分组 ----------
+  # ---------- Purpose groups ----------
 
-  # 流媒体专用：默认亚洲节点，可手动切 Japan / Hong Kong / Singapore / Auto Select / Direct
+  # Streaming: Asia by default, switchable to JP / HK / SG / Auto / Direct
   - name: 🌍 Streaming
     type: select
     proxies:
@@ -218,18 +221,18 @@ proxy-groups:
       - ♻️ Auto Select
       - 🎯 CN Direct
 
-  # AI 通用出口：默认美国节点
+  # Generic AI outbound: US by default
   - name: 🤖 AI
     type: select
     proxies:
       - 🇺🇸 United States
       - ♻️ Auto Select
 
-  # OpenAI / ChatGPT —— 官方不支持香港，故不提供香港选项
+  # OpenAI / ChatGPT - Hong Kong is not officially supported, so it is not offered
   - name: 🤖 OpenAI
     type: select
     proxies:
-      - 🇺🇸 United States   # 默认
+      - 🇺🇸 United States   # default
       - 🇯🇵 Japan
       - 🇸🇬 Singapore
       - 🇰🇷 South Korea
@@ -237,11 +240,11 @@ proxy-groups:
       - 🇬🇧 United Kingdom
       - ♻️ Auto Select
 
-  # Anthropic / Claude —— 官方不支持香港，故不提供香港选项
+  # Anthropic / Claude - Hong Kong is not officially supported, so it is not offered
   - name: 🤖 Claude
     type: select
     proxies:
-      - 🇺🇸 United States   # 默认
+      - 🇺🇸 United States   # default
       - 🇬🇧 United Kingdom
       - 🇯🇵 Japan
       - 🇸🇬 Singapore
@@ -249,11 +252,11 @@ proxy-groups:
       - 🇨🇳 Taiwan(China)
       - ♻️ Auto Select
 
-  # Google Gemini —— 官方支持香港，故保留香港选项
+  # Google Gemini - Hong Kong is officially supported, so it is kept
   - name: 🤖 Gemini
     type: select
     proxies:
-      - 🇺🇸 United States   # 默认
+      - 🇺🇸 United States   # default
       - 🇬🇧 United Kingdom
       - 🇯🇵 Japan
       - 🇭🇰 Hong Kong
@@ -262,26 +265,26 @@ proxy-groups:
       - 🇨🇳 Taiwan(China)
       - ♻️ Auto Select
 
-  # 国内直连
+  # Mainland China direct
   - name: 🎯 CN Direct
     type: select
     proxies:
       - DIRECT
 
-  # 拦截（Adobe 断网）
+  # Block (Adobe offline)
   - name: 🛑 Block
     type: select
     proxies:
       - REJECT
 
-# ---------- 分流规则（从上到下匹配，顺序很重要） ----------
+# ---------- Rules (matched top to bottom, order matters) ----------
 rules:
-  # ===== 1. Adobe 全家桶：全部断网（优先级最高） =====
-  # 注意：以下规则会拦截所有 Adobe 域名，应用将完全无法联网；
-  #       若日后购买了正版 Adobe，请删除本段规则。
-  # 关键词兜底：任何域名只要含 "adobe" 字样一律拦截（最彻底的兜底）
+  # ===== 1. Adobe: blocked entirely (highest priority) =====
+  # NOTE: these rules block every Adobe domain, the apps will be fully offline.
+  #       If you buy a genuine Adobe license later, delete this whole block.
+  # Keyword fallback: any domain containing "adobe" is blocked
   - DOMAIN-KEYWORD,adobe,🛑 Block
-  # ---- Adobe 主域名 ----
+  # ---- Adobe main domains ----
   - DOMAIN-SUFFIX,adobe.com,🛑 Block
   - DOMAIN-SUFFIX,adobe.net,🛑 Block
   - DOMAIN-SUFFIX,adobe.io,🛑 Block
@@ -299,7 +302,7 @@ rules:
   - DOMAIN-SUFFIX,adobestatic.com,🛑 Block
   - DOMAIN-SUFFIX,adobecc.com,🛑 Block
   - DOMAIN-SUFFIX,creativecloud.com,🛑 Block
-  # ---- Adobe 关联 / 收购产品 ----
+  # ---- Adobe related / acquired products ----
   - DOMAIN-SUFFIX,behance.net,🛑 Block
   - DOMAIN-SUFFIX,behance.com,🛑 Block
   - DOMAIN-SUFFIX,photoshop.com,🛑 Block
@@ -309,7 +312,7 @@ rules:
   - DOMAIN-SUFFIX,typekit.com,🛑 Block
   - DOMAIN-SUFFIX,typekit.net,🛑 Block
   - DOMAIN-SUFFIX,scene7.com,🛑 Block
-  # ---- Adobe Analytics / 数据追踪 ----
+  # ---- Adobe Analytics / tracking ----
   - DOMAIN-SUFFIX,omniture.com,🛑 Block
   - DOMAIN-SUFFIX,omtrdc.net,🛑 Block
   - DOMAIN-SUFFIX,demdex.net,🛑 Block
@@ -317,7 +320,7 @@ rules:
   - DOMAIN-SUFFIX,2o7.net,🛑 Block
   - DOMAIN-SUFFIX,adobestats.io,🛑 Block
 
-  # ===== 2. 内网 / 本地流量直连 =====
+  # ===== 2. LAN / local traffic -> DIRECT =====
   - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
   - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
   - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
@@ -325,25 +328,25 @@ rules:
   - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
   - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
 
-  # ===== 3. AI 服务：各自专属分组，默认美国节点 =====
-  # OpenAI / ChatGPT（不支持香港）
+  # ===== 3. AI services: dedicated groups, US by default =====
+  # OpenAI / ChatGPT (no Hong Kong)
   - GEOSITE,openai,🤖 OpenAI
   - DOMAIN-SUFFIX,openai.com,🤖 OpenAI
   - DOMAIN-SUFFIX,chatgpt.com,🤖 OpenAI
   - DOMAIN-SUFFIX,oaistatic.com,🤖 OpenAI
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 OpenAI
   - DOMAIN-SUFFIX,sora.com,🤖 OpenAI
-  # Anthropic / Claude（不支持香港）
+  # Anthropic / Claude (no Hong Kong)
   - DOMAIN-SUFFIX,anthropic.com,🤖 Claude
   - DOMAIN-SUFFIX,claude.ai,🤖 Claude
   - DOMAIN-SUFFIX,claudeusercontent.com,🤖 Claude
-  # Google Gemini（支持香港）
+  # Google Gemini (Hong Kong supported)
   - DOMAIN-SUFFIX,gemini.google.com,🤖 Gemini
   - DOMAIN-SUFFIX,bard.google.com,🤖 Gemini
   - DOMAIN-SUFFIX,aistudio.google.com,🤖 Gemini
   - DOMAIN-SUFFIX,deepmind.google,🤖 Gemini
   - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖 Gemini
-  # 其他 AI 服务 → AI 通用出口（美国）
+  # Other AI services -> generic AI outbound (US)
   - DOMAIN-SUFFIX,perplexity.ai,🤖 AI
   - DOMAIN-SUFFIX,huggingface.co,🤖 AI
   - DOMAIN-SUFFIX,midjourney.com,🤖 AI
@@ -357,7 +360,7 @@ rules:
   - DOMAIN-SUFFIX,x.ai,🤖 AI
   - DOMAIN-SUFFIX,grok.com,🤖 AI
 
-  # ===== 4. 流媒体：走亚洲节点（默认避开美国） =====
+  # ===== 4. Streaming: Asia nodes (US avoided by default) =====
   - GEOSITE,youtube,🌍 Streaming
   - GEOSITE,netflix,🌍 Streaming
   - GEOSITE,disney,🌍 Streaming
@@ -374,9 +377,9 @@ rules:
   - DOMAIN-SUFFIX,pixiv.net,🌍 Streaming
   - DOMAIN-SUFFIX,pximg.net,🌍 Streaming
 
-  # ===== 5. 国内流量：直连 =====
+  # ===== 5. Mainland China traffic -> DIRECT =====
   - GEOSITE,cn,🎯 CN Direct
   - GEOIP,CN,🎯 CN Direct,no-resolve
 
-  # ===== 6. 兜底：其余国外流量走默认代理 =====
+  # ===== 6. Fallback: everything else uses the default proxy =====
   - MATCH,🚀 Node Select

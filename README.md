@@ -12,9 +12,9 @@
 |---|---|---|
 | Adobe 相关域名 | 拦截（`REJECT`） | 否 |
 | 内网及本地流量 | 直连 | 否 |
-| OpenAI / ChatGPT | 美国节点 | 日本、新加坡、韩国、台湾、英国、自动选择 |
-| Claude | 美国节点 | 英国、日本、新加坡、韩国、台湾、自动选择 |
-| Gemini | 美国节点 | 英国、日本、香港、新加坡、韩国、台湾、自动选择 |
+| OpenAI / ChatGPT | 美国节点 | 日本、新加坡、韩国、中国台湾、英国、自动选择 |
+| Claude | 美国节点 | 英国、日本、新加坡、韩国、中国台湾、自动选择 |
+| Gemini | 美国节点 | 英国、日本、香港、新加坡、韩国、中国台湾、自动选择 |
 | 其他 AI 服务 | 美国节点 | 自动选择 |
 | YouTube、Netflix、Pinterest 等流媒体 | 亚洲节点 | 日本、香港、新加坡、自动选择、直连 |
 | 中国大陆网站与 IP | 直连 | 否 |
@@ -33,30 +33,30 @@
 | 🇯🇵 日本 | ✅ | ✅ | ✅ |
 | 🇸🇬 新加坡 | ✅ | ✅ | ✅ |
 | 🇰🇷 韩国 | ✅ | ✅ | ✅ |
-| 🇨🇳 台湾 | ✅ | ✅ | ✅ |
+| 🇨🇳 中国台湾 | ✅ | ✅ | ✅ |
 | 🇭🇰 香港 | ❌ | ❌ | ✅ |
 
 ## 节点分组
 
 | 分组 | 类型 | 说明 |
 |---|---|---|
-| 🚀 节点选择 | select | 默认出口，可选任意节点 / 策略组 |
-| ♻️ 自动选择 | url-test | 全部节点，自动选最低延迟 |
-| 🌏 亚洲节点 | url-test | 日 / 港 / 新 / 韩 / 台，自动选最低延迟 |
-| 🇯🇵 日本节点 | url-test | 日本节点池，自动选最低延迟 |
-| 🇭🇰 香港节点 | url-test | 香港节点池，自动选最低延迟 |
-| 🇸🇬 新加坡节点 | url-test | 新加坡节点池，自动选最低延迟 |
-| 🇰🇷 韩国节点 | url-test | 韩国节点池，自动选最低延迟 |
-| 🇨🇳 台湾节点 | url-test | 台湾节点池，自动选最低延迟 |
-| 🇺🇸 美国节点 | url-test | 美国节点池，自动选最低延迟 |
-| 🇬🇧 英国节点 | url-test | 英国节点池，自动选最低延迟 |
-| 🌍 流媒体专用 | select | 默认亚洲，可切日 / 港 / 新 / 自动 / 直连 |
-| 🤖 AI专用 | select | 其余 AI 服务通用出口，默认美国 |
+| 🚀 Node Select | select | 默认出口，可选任意节点 / 策略组 |
+| ♻️ Auto Select | url-test | 全部节点，自动选最低延迟 |
+| 🌏 Asia | url-test | 日 / 港 / 新 / 韩 / 台，自动选最低延迟 |
+| 🇯🇵 Japan | url-test | 日本节点池，自动选最低延迟 |
+| 🇭🇰 Hong Kong | url-test | 香港节点池，自动选最低延迟 |
+| 🇸🇬 Singapore | url-test | 新加坡节点池，自动选最低延迟 |
+| 🇰🇷 South Korea | url-test | 韩国节点池，自动选最低延迟 |
+| 🇨🇳 Taiwan(China) | url-test | 中国台湾节点池，自动选最低延迟 |
+| 🇺🇸 United States | url-test | 美国节点池，自动选最低延迟 |
+| 🇬🇧 United Kingdom | url-test | 英国节点池，自动选最低延迟 |
+| 🌍 Streaming | select | 默认亚洲，可切日 / 港 / 新 / 自动 / 直连 |
+| 🤖 AI | select | 其余 AI 服务通用出口，默认美国 |
 | 🤖 OpenAI | select | 默认美国，**无香港选项**（官方不支持） |
 | 🤖 Claude | select | 默认美国，**无香港选项**（官方不支持） |
 | 🤖 Gemini | select | 默认美国，含香港选项（官方支持） |
-| 🎯 国内直连 | select | 直连 |
-| 🛑 拦截 | select | 拦截（Adobe 断网） |
+| 🎯 CN Direct | select | 直连 |
+| 🛑 Block | select | 拦截（Adobe 断网） |
 
 ## 使用方法
 
@@ -92,11 +92,11 @@ proxy-providers:
 
 导入成功后，在客户端的「代理」页面进行选择：
 
-- `🚀 节点选择`：默认出口，可选择自动测速或指定节点
-- `🌏 亚洲节点` / `🇯🇵 日本节点` / `🇭🇰 香港节点` …：各地区节点池，自动选该地区最低延迟节点
-- `🌍 流媒体专用`：默认使用亚洲节点，也可切换到日本、香港、新加坡
+- `🚀 Node Select`：默认出口，可选择自动测速或指定节点
+- `🌏 Asia` / `🇯🇵 Japan` / `🇭🇰 Hong Kong` …：各地区节点池，自动选该地区最低延迟节点
+- `🌍 Streaming`：默认使用亚洲节点，也可切换到日本、香港、新加坡
 - `🤖 OpenAI` / `🤖 Claude` / `🤖 Gemini`：默认使用美国节点，可切换到各自官方支持的地区
-- `🤖 AI专用`：其余 AI 服务的通用出口，默认美国节点
+- `🤖 AI`：其余 AI 服务的通用出口，默认美国节点
 
 节点选择会由客户端保存，重启后通常无需重新设置。
 
@@ -107,9 +107,9 @@ proxy-providers:
 在 `rules` 中添加规则，并放到兜底规则 `MATCH` 之前：
 
 ```yaml
-- DOMAIN-SUFFIX,example.com,🚀 节点选择
-- DOMAIN-SUFFIX,example.cn,🎯 国内直连
-- DOMAIN-SUFFIX,example.net,🛑 拦截
+- DOMAIN-SUFFIX,example.com,🚀 Node Select
+- DOMAIN-SUFFIX,example.cn,🎯 CN Direct
+- DOMAIN-SUFFIX,example.net,🛑 Block
 ```
 
 规则从上到下匹配，越具体、优先级越高的规则应放得越靠前。
@@ -119,7 +119,7 @@ proxy-providers:
 各地区节点池通过 `proxy-groups` 中的 `filter` 正则筛选节点名称。如果订阅服务使用了不同的地区命名，请相应修改正则表达式：
 
 ```yaml
-- name: 🇯🇵 日本节点
+- name: 🇯🇵 Japan
   type: url-test
   use:
     - Provider

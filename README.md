@@ -1,114 +1,167 @@
-# Company Profile - Clash 配置文件
+# Clash YAML Profile
 
-一套开箱即用的 Clash 分流配置：国内直连、AI 走美国、流媒体走亚洲、Adobe 断网、节点按国家/地区细分并自动选最低延迟。
+一份面向个人使用的 Clash 分流配置，适用于 **Mihomo / Clash Meta** 内核，可导入 Clash Verge Rev、Mihomo Party、FlClash 等兼容客户端。
 
-## 分流策略总览
+配置文件：[config.yaml](./config.yaml)
 
-| 类型 | 策略 | 说明 |
-|------|------|------|
-| 🇨🇳 国内网站/应用 | **DIRECT 直连** | 百度、淘宝、B站、微信、微博等全部直连 |
-| 🤖 AI 服务 | **专属分组，默认美国** | OpenAI/Claude/Gemini 各自独立分组，默认美国，可手动切换友好地区 |
-| 🎬 流媒体 | **🌏 亚洲** | YouTube、Instagram、Netflix、TikTok 等走亚洲节点，避开美国 |
-| 🚫 Adobe 全线产品 | **REJECT 断网** | 阻止 Adobe 应用联网，防止授权验证弹窗/闪退 |
-| 🌐 其他国外流量 | **🎯 兜底规则** | 可手动切换任意节点/分组 |
+## 分流策略
 
-## 节点分组（14 个）
+规则按从上到下的顺序匹配，优先级如下：
+
+| 流量类型 | 默认策略 | 可手动切换 |
+|---|---|---|
+| Adobe 相关域名 | 拦截（`REJECT`） | 否 |
+| 内网及本地流量 | 直连 | 否 |
+| OpenAI / ChatGPT | 美国节点 | 日本、新加坡、韩国、台湾、英国、自动选择 |
+| Claude | 美国节点 | 英国、日本、新加坡、韩国、台湾、自动选择 |
+| Gemini | 美国节点 | 英国、日本、香港、新加坡、韩国、台湾、自动选择 |
+| 其他 AI 服务 | 美国节点 | 自动选择 |
+| YouTube、Netflix、Pinterest 等流媒体 | 亚洲节点 | 日本、香港、新加坡、自动选择、直连 |
+| 中国大陆网站与 IP | 直连 | 否 |
+| 其他未命中流量 | 节点选择 | 任意可用节点或策略组 |
+
+> 美国节点默认仅用于 AI 服务，以减少因频繁切换地区导致的账号风控风险。
+
+## AI 地区支持说明
+
+按各服务官方支持地区整理，官方不支持的地区不在可选列表中：
+
+| 地区 | OpenAI | Claude | Gemini |
+|---|:---:|:---:|:---:|
+| 🇺🇸 美国 | ✅ | ✅ | ✅ |
+| 🇬🇧 英国 | ✅ | ✅ | ✅ |
+| 🇯🇵 日本 | ✅ | ✅ | ✅ |
+| 🇸🇬 新加坡 | ✅ | ✅ | ✅ |
+| 🇰🇷 韩国 | ✅ | ✅ | ✅ |
+| 🇨🇳 台湾 | ✅ | ✅ | ✅ |
+| 🇭🇰 香港 | ❌ | ❌ | ✅ |
+
+## 节点分组
 
 | 分组 | 类型 | 说明 |
-|------|------|------|
-| 🚀 手动选择 | select | 总入口，可手动指定任意分组/节点 |
+|---|---|---|
+| 🚀 节点选择 | select | 默认出口，可选任意节点 / 策略组 |
 | ♻️ 自动选择 | url-test | 全部节点，自动选最低延迟 |
-| 🌏 亚洲 | url-test | 亚洲汇总（日/港/新/韩/台），自动选最低延迟 |
-| 🇯🇵 日本 | url-test | 日本节点（15 个），自动选最低延迟 |
-| 🇭🇰 香港 | url-test | 香港节点（9 个），自动选最低延迟 |
-| 🇸🇬 新加坡 | url-test | 新加坡节点（12 个），自动选最低延迟 |
-| 🇰🇷 韩国 | url-test | 韩国节点（2 个），自动选最低延迟 |
-| 🇨🇳 台湾 | url-test | 台湾节点（2 个），自动选最低延迟 |
-| 🇺🇸 美国 | url-test | 美国节点（12 个），自动选最低延迟 |
-| 🇬🇧 英国 | url-test | 英国节点（3 个），自动选最低延迟 |
-| 🤖 OpenAI | select | 默认美国；可选日/新/韩/台/英（**无香港**，OpenAI 不支持） |
-| 🤖 Claude | select | 默认美国；可选英/日/新/韩/台（**无香港**，Claude 不支持） |
-| 🤖 Gemini | select | 默认美国；可选英/日/新/韩/台/港 |
-| 🎯 兜底规则 | select | 可手动选择任意分组（含自动选择） |
-
-> 大洲分组说明：亚洲含多国节点故单独建「🌏 亚洲」分组；欧洲仅英国、北美仅美国，按需求不设洲级分组，直接使用「🇬🇧 英国」「🇺🇸 美国」。
-
-### AI 服务专属分组说明
-
-三个 AI 服务各自独立分组，**默认都走美国节点**，但只提供「对该 AI 友好的地区」选项：
-
-- **🤖 OpenAI**：不支持香港，故**不提供香港选项**，可选 美国/日本/新加坡/韩国/台湾/英国
-- **🤖 Claude**：不支持香港，故**不提供香港选项**，可选 美国/英国/日本/新加坡/韩国/台湾
-- **🤖 Gemini**：支持香港，可选 美国/英国/日本/新加坡/韩国/台湾/香港
-
-在 Clash 客户端「代理」面板中，找到对应分组即可手动切换节点地区。
+| 🌏 亚洲节点 | url-test | 日 / 港 / 新 / 韩 / 台，自动选最低延迟 |
+| 🇯🇵 日本节点 | url-test | 日本节点池，自动选最低延迟 |
+| 🇭🇰 香港节点 | url-test | 香港节点池，自动选最低延迟 |
+| 🇸🇬 新加坡节点 | url-test | 新加坡节点池，自动选最低延迟 |
+| 🇰🇷 韩国节点 | url-test | 韩国节点池，自动选最低延迟 |
+| 🇨🇳 台湾节点 | url-test | 台湾节点池，自动选最低延迟 |
+| 🇺🇸 美国节点 | url-test | 美国节点池，自动选最低延迟 |
+| 🇬🇧 英国节点 | url-test | 英国节点池，自动选最低延迟 |
+| 🌍 流媒体专用 | select | 默认亚洲，可切日 / 港 / 新 / 自动 / 直连 |
+| 🤖 AI专用 | select | 其余 AI 服务通用出口，默认美国 |
+| 🤖 OpenAI | select | 默认美国，**无香港选项**（官方不支持） |
+| 🤖 Claude | select | 默认美国，**无香港选项**（官方不支持） |
+| 🤖 Gemini | select | 默认美国，含香港选项（官方支持） |
+| 🎯 国内直连 | select | 直连 |
+| 🛑 拦截 | select | 拦截（Adobe 断网） |
 
 ## 使用方法
 
-### 1. 订阅链接已内置
+### 1. 准备订阅
 
-`config.yaml` 中已填入订阅链接：
+打开 `config.yaml`，确认 `proxy-providers.Provider.url` 是你自己的有效订阅地址。建议不要把包含 token 的真实订阅地址提交到公开仓库。
 
 ```yaml
 proxy-providers:
-  Company-Profile:
+  Provider:
     type: http
-    url: "https://liangxin.xyz/api/v1/liangxin?OwO=..."
-    interval: 172800   # 每 48 小时更新一次
+    url: "你的订阅地址"
+    interval: 172800     # 订阅更新间隔（秒），172800 = 每 2 天更新一次
 ```
 
-> 如需更换订阅，只需修改 `url` 的值。`interval` 单位为秒，`172800` = 每 2 天更新一次。
+### 2. 导入配置
 
-### 2. 导入 Clash
+**本地导入**
 
-**方式一：GitHub Raw 链接订阅（推荐）**
+1. 下载 `config.yaml`
+2. 打开 Clash 客户端的订阅或配置页面
+3. 选择「导入本地文件」，选中下载的 YAML
+4. 启用该配置并更新一次订阅
 
-在 Clash 客户端（Clash Verge Rev / ClashX / Clash for Windows 等）中添加订阅，填入：
+**通过 URL 导入**
 
+- GitHub Raw：`https://raw.githubusercontent.com/fairylandturbo1010-byte/clash-yaml-profile/main/config.yaml`
+- jsDelivr：`https://cdn.jsdelivr.net/gh/fairylandturbo1010-byte/clash-yaml-profile@main/config.yaml`
+
+使用 URL 导入后，仓库中的配置更新可以由客户端重新拉取。GitHub Raw 或 CDN 可能存在缓存延迟。
+
+### 3. 选择节点
+
+导入成功后，在客户端的「代理」页面进行选择：
+
+- `🚀 节点选择`：默认出口，可选择自动测速或指定节点
+- `🌏 亚洲节点` / `🇯🇵 日本节点` / `🇭🇰 香港节点` …：各地区节点池，自动选该地区最低延迟节点
+- `🌍 流媒体专用`：默认使用亚洲节点，也可切换到日本、香港、新加坡
+- `🤖 OpenAI` / `🤖 Claude` / `🤖 Gemini`：默认使用美国节点，可切换到各自官方支持的地区
+- `🤖 AI专用`：其余 AI 服务的通用出口，默认美国节点
+
+节点选择会由客户端保存，重启后通常无需重新设置。
+
+## 自定义配置
+
+### 添加域名规则
+
+在 `rules` 中添加规则，并放到兜底规则 `MATCH` 之前：
+
+```yaml
+- DOMAIN-SUFFIX,example.com,🚀 节点选择
+- DOMAIN-SUFFIX,example.cn,🎯 国内直连
+- DOMAIN-SUFFIX,example.net,🛑 拦截
 ```
-https://raw.githubusercontent.com/fairylandturbo1010-byte/company-profile/main/config.yaml
+
+规则从上到下匹配，越具体、优先级越高的规则应放得越靠前。
+
+### 调整地区节点
+
+各地区节点池通过 `proxy-groups` 中的 `filter` 正则筛选节点名称。如果订阅服务使用了不同的地区命名，请相应修改正则表达式：
+
+```yaml
+- name: 🇯🇵 日本节点
+  type: url-test
+  use:
+    - Provider
+  filter: '(?i)\bJP\b|日本|东京|大阪|名古屋|Japan|Tokyo|Osaka|Nagoya'
 ```
 
-**方式二：本地导入**
+### 恢复 Adobe 联网
 
-下载 `config.yaml`，在客户端中「导入本地配置文件」。
-
-### 3. 支持的客户端
-
-- Clash Verge / Clash Verge Rev（Mihomo 内核）
-- Clash for Windows
-- ClashX / ClashX Pro（macOS）
-- Clash for Android
-- Stash / Shadowrocket 等（支持 Clash 订阅）
-
-## Adobe 断网说明
-
-本配置拦截 Adobe 相关域名，防止非正版 Adobe 应用联网触发授权验证：
-
-- Adobe 主域名（adobe.com、adobe.io 等）
-- Creative Cloud 服务
-- 登录/认证（ims-na1.adobelogin.com 等）
-- 许可证管理（lm.licenses.adobe.com 等）
-- 正版验证（genuine.adobe.com 等）
-- Adobe Fonts / Typekit / Behance
-- 所有含 `adobe` 关键词的域名（兜底拦截）
-
-> ⚠️ 提示：此规则只对「经过 Clash 的流量」生效。Photoshop 等桌面软件可能不读系统代理、绕过 Clash 直连。建议开启 **TUN 模式**（Clash Verge Rev → 设置 → TUN 模式），或配合 Windows 防火墙阻止 Photoshop.exe 出站，才能 100% 保证断网。
-
-## 自定义修改
-
-编辑 `config.yaml`：
-
-- 添加断网域名：`- DOMAIN-SUFFIX,xxx.com,REJECT`
-- 添加直连域名：`- DOMAIN-SUFFIX,xxx.com,DIRECT`
-- 添加 AI 域名走美国：`- DOMAIN-SUFFIX,xxx.com,🇺🇸 美国`
-- 添加流媒体走亚洲：`- DOMAIN-SUFFIX,xxx.com,🌏 亚洲`
-- 修改某类流量走指定国家：把规则目标改成对应国家分组名（如 `🇯🇵 日本`）
+当前配置会拦截 Adobe 主域名、关联产品及部分统计域名。需要正常使用 Adobe 在线服务时，请删除 `rules` 中 Adobe 拦截段；仅切换代理节点不会解除拦截。
 
 ## 常见问题
 
-**Q：导入后没有节点？**
-订阅链接已内置并验证有效。若节点仍为空，请检查网络能否访问 `liangxin.xyz`，或在客户端手动「更新」订阅。
+**订阅更新失败或没有节点**
 
-**Q：测速出现 timeout？**
-各分组均使用 `url-test` 类型，会自动跳过超时节点，选择延迟最低的可用节点，不会因单个节点超时而中断。
+- 检查 `proxy-providers.Provider.url` 是否有效或已经过期
+- 在客户端中手动更新订阅
+- 检查当前网络能否访问订阅服务
+- 确认客户端使用 Mihomo / Clash Meta 内核
+
+**某个地区节点池为空**
+
+订阅中的节点名称可能无法匹配现有 `filter`。根据实际节点名称调整对应地区节点池的筛选正则。
+
+**网站分流不符合预期**
+
+- 检查配置是否处于 `rule` 模式
+- 查看客户端连接日志，确认实际命中的规则
+- 将自定义规则放在 `GEOSITE,cn`、`GEOIP,CN` 和最终 `MATCH` 规则之前
+
+**Adobe 官网或应用无法联网**
+
+这是 Adobe 拦截规则的预期行为。需要恢复访问时，请参照上方「恢复 Adobe 联网」。
+
+> 注意：本配置仅作用于经过 Clash 的流量。桌面应用（如 Photoshop）若不走系统代理，需要开启客户端的 **TUN 模式**，或使用系统防火墙出站规则才能真正断网。
+
+## 安全提示
+
+- 不要在公开仓库中提交包含 token、用户名或密码的订阅地址
+- 如果订阅地址曾公开，请立即到服务商后台重置订阅 token，并更新本地配置
+- 建议将含真实订阅地址的配置保存在私有仓库，或只保留在本地
+- 分享配置前，请用占位地址替换 `proxy-providers.Provider.url`
+
+## 配置检查
+
+修改 YAML 后，建议先使用客户端的配置校验功能确认语法无误，再启用新配置。若客户端提示不支持 `GEOSITE`、`GEOIP` 或 `proxy-providers`，请升级到较新的 Mihomo / Clash Meta 内核。

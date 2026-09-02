@@ -3,14 +3,15 @@
 #  个人 Clash 分流配置（适用于 Clash Meta / Mihomo 内核）
 #
 #  【分流策略】规则从上到下匹配，优先级如下
-#   1. Adobe 全家桶         → 断网（REJECT）
+#   1. Adobe 全家桶         → 断网（REJECT / 🛑 Block）
 #   2. 内网 / 本地流量       → 直连
 #   3. AI 服务              → OpenAI / Claude / Gemini 各自分组，默认美国节点
 #   4. 流媒体               → 默认亚洲节点（日/港/新/韩/台）
 #   5. 中国大陆网站与 IP     → 直连
-#   6. 其他未命中流量        → 🚀 节点选择（可手动切换）
+#   6. 其他未命中流量        → 🚀 Node Select（可手动切换）
 #
 #   ⚠️ 美国节点默认仅提供给 AI 服务，降低频繁切换地区带来的账号风控风险
+#   ⚠️ 所有分组名称均为英文（规则以英文逗号分隔，组名内禁止出现逗号）
 #
 #  【适用客户端】
 #   Clash Verge Rev / Mihomo Party / FlClash / Clash Meta
@@ -99,27 +100,27 @@ proxy-providers:
 # ---------- 代理组 ----------
 proxy-groups:
   # 默认出口：所有未命中国内规则的国外流量都从这里走
-  - name: 🚀 节点选择
+  - name: 🚀 Node Select
     type: select
     proxies:
-      - ♻️ 自动选择
-      - 🌏 亚洲节点
-      - 🇯🇵 日本节点
-      - 🇭🇰 香港节点
-      - 🇸🇬 新加坡节点
-      - 🇰🇷 韩国节点
-      - 🇨🇳 台湾节点
-      - 🇺🇸 美国节点
-      - 🇬🇧 英国节点
-      - 🌍 流媒体专用
-      - 🤖 AI专用
-      - 🎯 国内直连
-      - 🛑 拦截
+      - ♻️ Auto Select
+      - 🌏 Asia
+      - 🇯🇵 Japan
+      - 🇭🇰 Hong Kong
+      - 🇸🇬 Singapore
+      - 🇰🇷 South Korea
+      - 🇨🇳 Taiwan(China)
+      - 🇺🇸 United States
+      - 🇬🇧 United Kingdom
+      - 🌍 Streaming
+      - 🤖 AI
+      - 🎯 CN Direct
+      - 🛑 Block
     use:
       - Provider
 
   # 自动测速，选择延迟最低的节点
-  - name: ♻️ 自动选择
+  - name: ♻️ Auto Select
     type: url-test
     use:
       - Provider
@@ -131,8 +132,8 @@ proxy-groups:
   # 通过 filter 正则匹配节点名称自动归组，自动选该地区延迟最低的节点
   # 若订阅里地区命名不同，改对应的正则即可
 
-  # 亚洲汇总：日 / 港 / 新 / 韩 / 台
-  - name: 🌏 亚洲节点
+  # 亚洲汇总：Japan / Hong Kong / Singapore / South Korea / Taiwan
+  - name: 🌏 Asia
     type: url-test
     use:
       - Provider
@@ -141,7 +142,7 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  - name: 🇯🇵 日本节点
+  - name: 🇯🇵 Japan
     type: url-test
     use:
       - Provider
@@ -150,7 +151,7 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  - name: 🇭🇰 香港节点
+  - name: 🇭🇰 Hong Kong
     type: url-test
     use:
       - Provider
@@ -159,7 +160,7 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  - name: 🇸🇬 新加坡节点
+  - name: 🇸🇬 Singapore
     type: url-test
     use:
       - Provider
@@ -168,7 +169,7 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  - name: 🇰🇷 韩国节点
+  - name: 🇰🇷 South Korea
     type: url-test
     use:
       - Provider
@@ -177,7 +178,7 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  - name: 🇨🇳 台湾节点
+  - name: 🇨🇳 Taiwan(China)
     type: url-test
     use:
       - Provider
@@ -186,7 +187,7 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  - name: 🇺🇸 美国节点
+  - name: 🇺🇸 United States
     type: url-test
     use:
       - Provider
@@ -195,7 +196,7 @@ proxy-groups:
     interval: 300
     tolerance: 50
 
-  - name: 🇬🇧 英国节点
+  - name: 🇬🇧 United Kingdom
     type: url-test
     use:
       - Provider
@@ -206,69 +207,69 @@ proxy-groups:
 
   # ---------- 用途分组 ----------
 
-  # 流媒体专用：默认亚洲节点，可手动切日本 / 香港 / 新加坡 / 自动选择 / 直连
-  - name: 🌍 流媒体专用
+  # 流媒体专用：默认亚洲节点，可手动切 Japan / Hong Kong / Singapore / Auto Select / Direct
+  - name: 🌍 Streaming
     type: select
     proxies:
-      - 🌏 亚洲节点
-      - 🇯🇵 日本节点
-      - 🇭🇰 香港节点
-      - 🇸🇬 新加坡节点
-      - ♻️ 自动选择
-      - 🎯 国内直连
+      - 🌏 Asia
+      - 🇯🇵 Japan
+      - 🇭🇰 Hong Kong
+      - 🇸🇬 Singapore
+      - ♻️ Auto Select
+      - 🎯 CN Direct
 
   # AI 通用出口：默认美国节点
-  - name: 🤖 AI专用
+  - name: 🤖 AI
     type: select
     proxies:
-      - 🇺🇸 美国节点
-      - ♻️ 自动选择
+      - 🇺🇸 United States
+      - ♻️ Auto Select
 
   # OpenAI / ChatGPT —— 官方不支持香港，故不提供香港选项
   - name: 🤖 OpenAI
     type: select
     proxies:
-      - 🇺🇸 美国节点      # 默认
-      - 🇯🇵 日本节点
-      - 🇸🇬 新加坡节点
-      - 🇰🇷 韩国节点
-      - 🇨🇳 台湾节点
-      - 🇬🇧 英国节点
-      - ♻️ 自动选择
+      - 🇺🇸 United States   # 默认
+      - 🇯🇵 Japan
+      - 🇸🇬 Singapore
+      - 🇰🇷 South Korea
+      - 🇨🇳 Taiwan(China)
+      - 🇬🇧 United Kingdom
+      - ♻️ Auto Select
 
   # Anthropic / Claude —— 官方不支持香港，故不提供香港选项
   - name: 🤖 Claude
     type: select
     proxies:
-      - 🇺🇸 美国节点      # 默认
-      - 🇬🇧 英国节点
-      - 🇯🇵 日本节点
-      - 🇸🇬 新加坡节点
-      - 🇰🇷 韩国节点
-      - 🇨🇳 台湾节点
-      - ♻️ 自动选择
+      - 🇺🇸 United States   # 默认
+      - 🇬🇧 United Kingdom
+      - 🇯🇵 Japan
+      - 🇸🇬 Singapore
+      - 🇰🇷 South Korea
+      - 🇨🇳 Taiwan(China)
+      - ♻️ Auto Select
 
   # Google Gemini —— 官方支持香港，故保留香港选项
   - name: 🤖 Gemini
     type: select
     proxies:
-      - 🇺🇸 美国节点      # 默认
-      - 🇬🇧 英国节点
-      - 🇯🇵 日本节点
-      - 🇭🇰 香港节点
-      - 🇸🇬 新加坡节点
-      - 🇰🇷 韩国节点
-      - 🇨🇳 台湾节点
-      - ♻️ 自动选择
+      - 🇺🇸 United States   # 默认
+      - 🇬🇧 United Kingdom
+      - 🇯🇵 Japan
+      - 🇭🇰 Hong Kong
+      - 🇸🇬 Singapore
+      - 🇰🇷 South Korea
+      - 🇨🇳 Taiwan(China)
+      - ♻️ Auto Select
 
   # 国内直连
-  - name: 🎯 国内直连
+  - name: 🎯 CN Direct
     type: select
     proxies:
       - DIRECT
 
   # 拦截（Adobe 断网）
-  - name: 🛑 拦截
+  - name: 🛑 Block
     type: select
     proxies:
       - REJECT
@@ -279,42 +280,42 @@ rules:
   # 注意：以下规则会拦截所有 Adobe 域名，应用将完全无法联网；
   #       若日后购买了正版 Adobe，请删除本段规则。
   # 关键词兜底：任何域名只要含 "adobe" 字样一律拦截（最彻底的兜底）
-  - DOMAIN-KEYWORD,adobe,🛑 拦截
+  - DOMAIN-KEYWORD,adobe,🛑 Block
   # ---- Adobe 主域名 ----
-  - DOMAIN-SUFFIX,adobe.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobe.net,🛑 拦截
-  - DOMAIN-SUFFIX,adobe.io,🛑 拦截
-  - DOMAIN-SUFFIX,adobe-dns.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobelogin.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobess.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobegenuine.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobespark.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobestock.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobefonts.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobeconnect.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobeexchange.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobecqms.net,🛑 拦截
-  - DOMAIN-SUFFIX,adobedtm.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobestatic.com,🛑 拦截
-  - DOMAIN-SUFFIX,adobecc.com,🛑 拦截
-  - DOMAIN-SUFFIX,creativecloud.com,🛑 拦截
+  - DOMAIN-SUFFIX,adobe.com,🛑 Block
+  - DOMAIN-SUFFIX,adobe.net,🛑 Block
+  - DOMAIN-SUFFIX,adobe.io,🛑 Block
+  - DOMAIN-SUFFIX,adobe-dns.com,🛑 Block
+  - DOMAIN-SUFFIX,adobelogin.com,🛑 Block
+  - DOMAIN-SUFFIX,adobess.com,🛑 Block
+  - DOMAIN-SUFFIX,adobegenuine.com,🛑 Block
+  - DOMAIN-SUFFIX,adobespark.com,🛑 Block
+  - DOMAIN-SUFFIX,adobestock.com,🛑 Block
+  - DOMAIN-SUFFIX,adobefonts.com,🛑 Block
+  - DOMAIN-SUFFIX,adobeconnect.com,🛑 Block
+  - DOMAIN-SUFFIX,adobeexchange.com,🛑 Block
+  - DOMAIN-SUFFIX,adobecqms.net,🛑 Block
+  - DOMAIN-SUFFIX,adobedtm.com,🛑 Block
+  - DOMAIN-SUFFIX,adobestatic.com,🛑 Block
+  - DOMAIN-SUFFIX,adobecc.com,🛑 Block
+  - DOMAIN-SUFFIX,creativecloud.com,🛑 Block
   # ---- Adobe 关联 / 收购产品 ----
-  - DOMAIN-SUFFIX,behance.net,🛑 拦截
-  - DOMAIN-SUFFIX,behance.com,🛑 拦截
-  - DOMAIN-SUFFIX,photoshop.com,🛑 拦截
-  - DOMAIN-SUFFIX,magento.com,🛑 拦截
-  - DOMAIN-SUFFIX,marketo.com,🛑 拦截
-  - DOMAIN-SUFFIX,echosign.com,🛑 拦截
-  - DOMAIN-SUFFIX,typekit.com,🛑 拦截
-  - DOMAIN-SUFFIX,typekit.net,🛑 拦截
-  - DOMAIN-SUFFIX,scene7.com,🛑 拦截
+  - DOMAIN-SUFFIX,behance.net,🛑 Block
+  - DOMAIN-SUFFIX,behance.com,🛑 Block
+  - DOMAIN-SUFFIX,photoshop.com,🛑 Block
+  - DOMAIN-SUFFIX,magento.com,🛑 Block
+  - DOMAIN-SUFFIX,marketo.com,🛑 Block
+  - DOMAIN-SUFFIX,echosign.com,🛑 Block
+  - DOMAIN-SUFFIX,typekit.com,🛑 Block
+  - DOMAIN-SUFFIX,typekit.net,🛑 Block
+  - DOMAIN-SUFFIX,scene7.com,🛑 Block
   # ---- Adobe Analytics / 数据追踪 ----
-  - DOMAIN-SUFFIX,omniture.com,🛑 拦截
-  - DOMAIN-SUFFIX,omtrdc.net,🛑 拦截
-  - DOMAIN-SUFFIX,demdex.net,🛑 拦截
-  - DOMAIN-SUFFIX,everesttech.net,🛑 拦截
-  - DOMAIN-SUFFIX,2o7.net,🛑 拦截
-  - DOMAIN-SUFFIX,adobestats.io,🛑 拦截
+  - DOMAIN-SUFFIX,omniture.com,🛑 Block
+  - DOMAIN-SUFFIX,omtrdc.net,🛑 Block
+  - DOMAIN-SUFFIX,demdex.net,🛑 Block
+  - DOMAIN-SUFFIX,everesttech.net,🛑 Block
+  - DOMAIN-SUFFIX,2o7.net,🛑 Block
+  - DOMAIN-SUFFIX,adobestats.io,🛑 Block
 
   # ===== 2. 内网 / 本地流量直连 =====
   - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
@@ -343,39 +344,39 @@ rules:
   - DOMAIN-SUFFIX,deepmind.google,🤖 Gemini
   - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖 Gemini
   # 其他 AI 服务 → AI 通用出口（美国）
-  - DOMAIN-SUFFIX,perplexity.ai,🤖 AI专用
-  - DOMAIN-SUFFIX,huggingface.co,🤖 AI专用
-  - DOMAIN-SUFFIX,midjourney.com,🤖 AI专用
-  - DOMAIN-SUFFIX,copilot.microsoft.com,🤖 AI专用
-  - DOMAIN-SUFFIX,copilot.github.com,🤖 AI专用
-  - DOMAIN-SUFFIX,blackbox.ai,🤖 AI专用
-  - DOMAIN-SUFFIX,groq.com,🤖 AI专用
-  - DOMAIN-SUFFIX,mistral.ai,🤖 AI专用
-  - DOMAIN-SUFFIX,cohere.com,🤖 AI专用
-  - DOMAIN-SUFFIX,poe.com,🤖 AI专用
-  - DOMAIN-SUFFIX,x.ai,🤖 AI专用
-  - DOMAIN-SUFFIX,grok.com,🤖 AI专用
+  - DOMAIN-SUFFIX,perplexity.ai,🤖 AI
+  - DOMAIN-SUFFIX,huggingface.co,🤖 AI
+  - DOMAIN-SUFFIX,midjourney.com,🤖 AI
+  - DOMAIN-SUFFIX,copilot.microsoft.com,🤖 AI
+  - DOMAIN-SUFFIX,copilot.github.com,🤖 AI
+  - DOMAIN-SUFFIX,blackbox.ai,🤖 AI
+  - DOMAIN-SUFFIX,groq.com,🤖 AI
+  - DOMAIN-SUFFIX,mistral.ai,🤖 AI
+  - DOMAIN-SUFFIX,cohere.com,🤖 AI
+  - DOMAIN-SUFFIX,poe.com,🤖 AI
+  - DOMAIN-SUFFIX,x.ai,🤖 AI
+  - DOMAIN-SUFFIX,grok.com,🤖 AI
 
   # ===== 4. 流媒体：走亚洲节点（默认避开美国） =====
-  - GEOSITE,youtube,🌍 流媒体专用
-  - GEOSITE,netflix,🌍 流媒体专用
-  - GEOSITE,disney,🌍 流媒体专用
-  - GEOSITE,spotify,🌍 流媒体专用
-  - DOMAIN-SUFFIX,pinterest.com,🌍 流媒体专用
-  - DOMAIN-SUFFIX,pinimg.com,🌍 流媒体专用
-  - DOMAIN-SUFFIX,instagram.com,🌍 流媒体专用
-  - DOMAIN-SUFFIX,cdninstagram.com,🌍 流媒体专用
-  - DOMAIN-SUFFIX,twitch.tv,🌍 流媒体专用
-  - DOMAIN-SUFFIX,dailymotion.com,🌍 流媒体专用
-  - DOMAIN-SUFFIX,tiktok.com,🌍 流媒体专用
-  - DOMAIN-SUFFIX,tiktokcdn.com,🌍 流媒体专用
-  - DOMAIN-SUFFIX,tiktokcdn-us.com,🌍 流媒体专用
-  - DOMAIN-SUFFIX,pixiv.net,🌍 流媒体专用
-  - DOMAIN-SUFFIX,pximg.net,🌍 流媒体专用
+  - GEOSITE,youtube,🌍 Streaming
+  - GEOSITE,netflix,🌍 Streaming
+  - GEOSITE,disney,🌍 Streaming
+  - GEOSITE,spotify,🌍 Streaming
+  - DOMAIN-SUFFIX,pinterest.com,🌍 Streaming
+  - DOMAIN-SUFFIX,pinimg.com,🌍 Streaming
+  - DOMAIN-SUFFIX,instagram.com,🌍 Streaming
+  - DOMAIN-SUFFIX,cdninstagram.com,🌍 Streaming
+  - DOMAIN-SUFFIX,twitch.tv,🌍 Streaming
+  - DOMAIN-SUFFIX,dailymotion.com,🌍 Streaming
+  - DOMAIN-SUFFIX,tiktok.com,🌍 Streaming
+  - DOMAIN-SUFFIX,tiktokcdn.com,🌍 Streaming
+  - DOMAIN-SUFFIX,tiktokcdn-us.com,🌍 Streaming
+  - DOMAIN-SUFFIX,pixiv.net,🌍 Streaming
+  - DOMAIN-SUFFIX,pximg.net,🌍 Streaming
 
   # ===== 5. 国内流量：直连 =====
-  - GEOSITE,cn,🎯 国内直连
-  - GEOIP,CN,🎯 国内直连,no-resolve
+  - GEOSITE,cn,🎯 CN Direct
+  - GEOIP,CN,🎯 CN Direct,no-resolve
 
   # ===== 6. 兜底：其余国外流量走默认代理 =====
-  - MATCH,🚀 节点选择
+  - MATCH,🚀 Node Select
